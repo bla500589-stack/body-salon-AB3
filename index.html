@@ -1,276 +1,781 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بودي - نظام صالونات الحلاقة</title>
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <style>body { margin: 0; padding: 0; }</style>
-</head>
-<body>
-    <div id="root"></div>
-    <script type="text/babel">
-        // --- الكود بتاعك بالكامل هنا ---
-        const { useState, useEffect } = React;
+import React, { useState, useEffect } from "react";
 
-        const services = [
-          { id: 1, name: "شعر ودقن", price: 130 },
-          { id: 2, name: "شعر بس", price: 100 },
-          { id: 3, name: "شعر ودقن واستشوار", price: 200 },
-          { id: 4, name: "شعر ودقن واستشوار + ماسك", price: 300 },
-          { id: 5, name: "عرض العريس", price: 1000 },
-          { id: 6, name: "عرض الروشنة", price: 500 },
-        ];
-        const branches = ["عين شمس", "المرج", "الدقي"];
-        const barbers = ["محمود", "نور", "عمر السيد", "عمر علاء", "مصطفى مشعل"];
-        const times = ["10:00 ص", "11:00 ص", "12:00 م", "1:00 م", "2:00 م", "3:00 م", "4:00 م", "5:00 م", "6:00 م"];
-        
-        const css = `
-        *{box-sizing:border-box}
-        body{margin:0;font-family:Tahoma,Arial;background:#f3f5f9;color:#172338}
-        button,input,select{font:inherit}
-        button{cursor:pointer}
-        .app{direction:rtl;min-height:100vh}
-        header{background:#142238;color:white;padding:20px 6%;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-        header h2{margin:0;color:#e8bb76;font-size:35px;font-weight:bold;}
-        header small{color:#bbc5d5}
-        nav{display:flex;gap:8px;flex-wrap:wrap;padding:15px 6%;background:white;border-bottom:1px solid #ddd}
-        nav button{border:0;border-radius:8px;padding:10px 14px;background:#edf0f5;color:#172338}
-        nav button.active{background:#142238;color:white}
-        main{max-width:1100px;margin:auto;padding:25px 16px}
-        .hero{background:linear-gradient(120deg,#142238,#344b68);color:white;padding:30px;border-radius:16px;margin-bottom:22px;}
-        .hero h1{font-size:32px;margin:10px 0}
-        .gold{color:#e8bb76}
-        .marquee-container { width: 100%; overflow: hidden; background: #a77835; color: white; padding: 10px 0; border-radius: 8px; margin-bottom: 20px;}
-        .marquee-content { display: inline-block; white-space: nowrap; animation: marquee 15s linear infinite; font-weight: bold; font-size: 18px;}
-        @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
-        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #17663a; color: white; padding: 15px 30px; border-radius: 8px; font-size: 20px; font-weight: bold; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.3); animation: slideDown 0.5s ease-out; }
-        @keyframes slideDown { from { top: -100px; } to { top: 20px; } }
-        .toast.nabi { background: #d4af37; color: #142238; }
-        .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:13px}
-        .card,.panel{background:white;border:1px solid #e2e6ed;border-radius:12px;padding:17px;margin-bottom:13px}
-        .card h3{margin:5px 0 10px}
-        .price{font-size:22px;font-weight:bold;color:#a77835}
-        button.primary{border:0;background:#e8bb76;color:#142238;font-weight:bold;border-radius:8px;padding:12px 16px}
-        button.secondary{border:0;background:#142238;color:white;border-radius:8px;padding:10px 14px}
-        button.danger{border:0;background:#fee9e9;color:#9b2525;border-radius:7px;padding:8px}
-        input,select{width:100%;padding:12px;border:1px solid #d9dee8;border-radius:8px;background:white;margin:7px 0 13px}
-        label{font-size:13px;font-weight:bold}
-        h2.section{font-size:22px;margin-top:28px}
-        .muted{font-size:12px;color:#788397;line-height:1.8}
-        .success{background:#e6f8ed;color:#17663a;padding:13px;border-radius:9px;margin-bottom:15px}
-        .warning-box { background: #fff3cd; color: #856404; padding: 13px; border-radius: 9px; border: 1px solid #ffeeba; margin-bottom: 15px; font-weight: bold;}
-        .row{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
-        .stat{background:#fff;border:1px solid #e2e6ed;padding:17px;border-radius:12px}
-        .stat strong{display:block;font-size:25px;margin-top:8px;color:#a77835}
-        footer{text-align:center;padding:25px;color:#8993a2;font-size:12px}
-        .game-board { display: grid; grid-template-columns: repeat(3, 100px); gap: 5px; justify-content: center; margin-top: 20px;}
-        .square { width: 100px; height: 100px; background: #fff; border: 2px solid #142238; font-size: 50px; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #142238;}
-        .square:hover { background: #f0f0f0; }
-        `;
+const services = [
+  { id: 1, name: "شعر ودقن", price: 130 },
+  { id: 2, name: "شعر بس", price: 100 },
+  { id: 3, name: "شعر ودقن واستشوار", price: 200 },
+  { id: 4, name: "شعر ودقن واستشوار + ماسك", price: 300 },
+  { id: 5, name: "عرض العريس", price: 1000 },
+  { id: 6, name: "عرض الروشنة", price: 500 },
+];
+const barbers = ["محمود", "نور", "عمر السيد", "عمر علاء", "مصطفى مشعل"];
+const branches = ["عين شمس", "المرج", "الدقي"];
+const times = [
+  "10:00 ص",
+  "11:00 ص",
+  "12:00 م",
+  "1:00 م",
+  "2:00 م",
+  "3:00 م",
+  "4:00 م",
+  "5:00 م",
+  "6:00 م",
+];
 
-        function App() {
-          const [page, setPage] = useState("home");
-          const [bookings, setBookings] = useState(() => {
-            try { return JSON.parse(localStorage.getItem("body_bookings") || "[]"); } catch { return []; }
-          });
-          const [branch, setBranch] = useState(branches[0]);
-          const [barber, setBarber] = useState(barbers[0]);
-          const [bookingType, setBookingType] = useState("advance"); 
-          const [date, setDate] = useState(new Date().toLocaleDateString("en-CA"));
-          const [time, setTime] = useState(times[0]);
-          const [name, setName] = useState("");
-          const [phone, setPhone] = useState("");
-          const [message, setMessage] = useState("");
-          const [toastMessage, setToastMessage] = useState(null);
-          const [audioEnabled, setAudioEnabled] = useState(false);
-          const [board, setBoard] = useState(Array(9).fill(null));
-          const [isXNext, setIsXNext] = useState(true);
-          
-          const winner = calculateWinner(board);
+const initialStyle = `
+* { box-sizing: border-box; }
+body { margin: 0; font-family: Arial, sans-serif; background: #0b0d12; color: #ffffff; }
+button, input, select { font: inherit; }
+button { cursor: pointer; }
+.boddy-app { direction: rtl; min-height: 100vh; padding: 18px; max-width: 1100px; margin: auto; color: #ffffff; }
+.header { text-align: center; padding: 28px 15px; border-radius: 20px; background: linear-gradient(135deg, #101827, #172c49); border: 1px solid #2f4565; margin-bottom: 20px; }
+.header h1 { margin: 0 0 10px; color: #71b7ff; font-size: 38px; }
+.header p { margin: 0; color: #d0d8e5; }
+.card { background: #151923; border: 1px solid #292f3d; border-radius: 16px; padding: 18px; margin-bottom: 16px; color: #ffffff; }
+.card h2 { color: #71b7ff; margin-top: 0; }
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 13px; }
+.field { display: flex; flex-direction: column; gap: 7px; }
+.field label { color: #ffffff; font-size: 14px; }
+.field input, .field select { width: 100%; padding: 12px; color: white; background: #0d111a; border: 1px solid #343d4d; border-radius: 10px; }
+.primary-btn { border: 0; border-radius: 10px; padding: 13px 18px; color: #07111d; background: #71b7ff; font-weight: bold; }
+.secondary-btn { border: 1px solid #43516a; border-radius: 10px; padding: 10px 14px; color: white; background: #202838; }
+.danger-btn { border: 1px solid #713d47; border-radius: 10px; padding: 9px 12px; color: #ffb7c1; background: #351b23; }
+.button-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
+.service-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 12px; }
+.service-option { background: #0d111a; border: 1px solid #343d4d; border-radius: 12px; padding: 15px; text-align: center; color: #ffffff; }
+.service-option.selected { border: 2px solid #71b7ff; background: #172b43; }
+.service-option strong { display: block; margin-bottom: 8px; }
+.price { color: #71b7ff; font-weight: bold; }
+.notice { background: #172b43; border: 1px solid #31577e; padding: 13px; border-radius: 10px; margin-top: 12px; color: #ffffff; }
+.booking-item { background: #0d111a; border: 1px solid #343d4d; padding: 13px; border-radius: 12px; margin-bottom: 10px; color: #ffffff; }
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+.stat { padding: 16px; background: #0d111a; border: 1px solid #343d4d; border-radius: 12px; color: #ffffff; }
+.stat strong { display: block; color: #71b7ff; font-size: 24px; margin-top: 8px; }
+.footer { text-align: center; padding: 20px 5px; color: #8d99ac; }
+.footer a { color: #71b7ff; margin: 0 7px; text-decoration: none; }
+.memory-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 15px; }
+.memory-card { background: #0d111a; border: 1px solid #343d4d; border-radius: 10px; height: 60px; font-size: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; }
+.memory-card.flipped { background: #172b43; border-color: #71b7ff; }
+.tasbeeh-text { font-size: 45px; color: #71b7ff; margin: 20px 0; text-align: center;}
+.zekr-selector { background: #0d111a; border: 1px solid #343d4d; border-radius: 10px; padding: 10px; margin-bottom: 20px; }
+.zekr-selector select { width: 100%; padding: 10px; background: #151923; color: white; border: none; font-size: 18px; }
+.queue-display { background: #17663a; border: 2px solid #4ade80; border-radius: 12px; padding: 20px; text-align: center; margin-top: 20px; color: white; }
+.queue-display h2 { color: #ffffff; margin: 0 0 10px 0; font-size: 30px; }
+.queue-display p { font-size: 20px; margin: 5px 0; font-weight: bold; }
+@media (max-width: 600px) { .boddy-app { padding: 10px; } .header h1 { font-size: 30px; } }
+`;
 
-          useEffect(() => { localStorage.setItem("body_bookings", JSON.stringify(bookings)); }, [bookings]);
-          useEffect(() => {
-            const interval = setInterval(() => {
-              setToastMessage({ text: "صلي على النبي ﷺ ✨", type: "nabi" });
-              setTimeout(() => setToastMessage(null), 4000);
-            }, 180000); 
-            return () => clearInterval(interval);
-          }, []);
+export default function App() {
+  const [page, setPage] = useState("booking");
+  const [customer, setCustomer] = useState("");
+  const [phone, setPhone] = useState("");
+  const [branch, setBranch] = useState(branches[0]);
+  const [serviceId, setServiceId] = useState(1);
+  const [barber, setBarber] = useState(barbers[0]);
+  const [date, setDate] = useState("");
+  const [time, setTime] = useState(times[0]);
+  const [payment, setPayment] = useState("كاش");
+  const [bookings, setBookings] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("boddy_bookings") || "[]");
+    } catch {
+      return [];
+    }
+  });
+  const [search, setSearch] = useState("");
+  const [adminPassword, setAdminPassword] = useState("");
+  const [adminUnlocked, setAdminUnlocked] = useState(false);
+  const [lastInstantBooking, setLastInstantBooking] = useState(null);
 
-          function playSound() {
-            if (!audioEnabled) return;
-            const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3");
-            audio.play().catch(e => console.log("Audio blocked"));
-          }
+  const zekrList = [
+    "سبحان الله",
+    "الحمد لله",
+    "الله أكبر",
+    "صلى الله عليه وسلم",
+    "أستغفر الله",
+  ];
+  const [zekrIndex, setZekrIndex] = useState(0);
+  const [tasbeeh, setTasbeeh] = useState(0);
+  const [showTasbeehMessage, setShowTasbeehMessage] = useState(false);
 
-          function handleBooking(e, service) {
-            e.preventDefault();
-            if (!name.trim() || !phone.trim()) {
-              setMessage("من فضلك اكتب اسم العميل ورقم الموبايل.");
-              return;
-            }
-            let newBooking = {};
-            const deposit = service.price / 2; 
-            if (bookingType === "advance") {
-              newBooking = { id: Date.now(), name, phone, branch, barber, service: service.name, price: service.price, type: "حجز مسبق", date, time, deposit: deposit, status: "مؤكد (عربون غير مسترد)" };
-              setMessage("تم تسجيل الحجز المسبق! برجاء الحضور في الميعاد.");
-            } else {
-              const currentQueue = bookings.filter(b => b.type === "دور الآن").length;
-              const myTurn = 100 + currentQueue;
-              newBooking = { id: Date.now(), name, phone, branch, barber, service: service.name, price: service.price, type: "دور الآن", turnNumber: myTurn, deposit: 0, status: "في الانتظار" };
-              setMessage(`تم تسجيلك في الانتظار! رقم دورك هو: ${myTurn}`);
-              setTimeout(() => {
-                setToastMessage({ text: `دورك جه يا ${name}، اتفضل الكرسي رقم 1`, type: "turn" });
-                playSound();
-                setTimeout(() => setToastMessage(null), 8000);
-              }, 10000);
-            }
-            setBookings(old => [newBooking, ...old]);
-            setName(""); setPhone(""); setPage("bookings");
-          }
+  const [withdrawals, setWithdrawals] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("boddy_withdrawals") || "[]");
+    } catch {
+      return [];
+    }
+  });
+  const [withdrawAmount, setWithdrawAmount] = useState("");
+  const [withdrawName, setWithdrawName] = useState("");
+  const [withdrawNote, setWithdrawNote] = useState("");
 
-          const nav = [["home", "الرئيسية"], ["booking", "حجز جديد"], ["bookings", "الحجوزات"], ["games", "تسلية 🎮"], ["admin", "الإدارة"]];
-          const totalVisits = bookings.length;
-          const visitsText = totalVisits >= 5 ? "مبروك! زيارتك السادسة مجانية بالكامل ✂️🎉" : `فاضلك ${5 - totalVisits} زيارات وتاخد السادسة مجاناً بكل حاجة! 🎁`;
+  const [xoBoard, setXoBoard] = useState(Array(9).fill(""));
+  const [xoTurn, setXoTurn] = useState("X");
+  const [xoMessage, setXoMessage] = useState("دور اللاعب X");
+  const [memoryCards, setMemoryCards] = useState([]);
+  const [memoryOpen, setMemoryOpen] = useState([]);
+  const [memoryMatched, setMemoryMatched] = useState([]);
+  useEffect(() => {
+    localStorage.setItem("boddy_bookings", JSON.stringify(bookings));
+  }, [bookings]);
+  useEffect(() => {
+    localStorage.setItem("boddy_withdrawals", JSON.stringify(withdrawals));
+  }, [withdrawals]);
 
-          return (
-            <div className="app">
-              <style>{css}</style>
-              {toastMessage && (<div className={`toast ${toastMessage.type}`}>{toastMessage.text}</div>)}
-              <header>
-                <div><h2>بودي</h2><small>نظام صالونات الحلاقة الذكي</small></div>
-                <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                  {!audioEnabled && (<button className="primary" onClick={() => setAudioEnabled(true)} style={{ background: "#e74c3c", color: "white" }}>🔊 تفعيل الرنات</button>)}
-                  <span>💈 احجز حلاقتك بسهولة</span>
-                </div>
-              </header>
-              <nav>
-                {nav.map(([id, title]) => (<button key={id} className={page === id ? "active" : ""} onClick={() => { setPage(id); setMessage(""); }}>{title}</button>))}
-              </nav>
-              <main>
-                {message && (<div className="success">{message}<button onClick={() => setMessage("")} style={{ float: "left", border: 0, background: "transparent" }}>✕</button></div>)}
-                
-                {page === "home" && (
-                  <>
-                    <div className="marquee-container"><div className="marquee-content">🔥 خصم خاص على عرض العريس! | ✨ عرض الروشنة بـ 500 جنيه | 💈 استشوار مجاني مع الماسك</div></div>
-                    <section className="hero">
-                      <small className="gold">تجربة حلاقة مختلفة</small>
-                      <h1>حلاقتك الجاية، <span className="gold">على مزاجك.</span></h1>
-                      <p>اختار الفرع والحلاق والخدمة المناسبة ليك. احجز موعدك واجمع زياراتك للحصول على مكافآت.</p>
-                      <button className="primary" onClick={() => setPage("booking")}>احجز موعدك الآن ←</button>
-                    </section>
-                    <h2 className="section">الخدمات والأسعار</h2>
-                    <div className="grid">
-                      {services.map(s => (
-                        <div className="card" key={s.id}>
-                          <h3>✂ {s.name}</h3><p className="price">{s.price} جنيه</p>
-                          <button className="secondary" onClick={() => setPage("booking")}>اختار الخدمة</button>
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                )}
+  useEffect(() => {
+    const style = document.createElement("style");
+    style.textContent = initialStyle;
+    document.head.appendChild(style);
+    return () => document.head.removeChild(style);
+  }, []);
 
-                {page === "booking" && (
-                  <>
-                    <h2 className="section">حجز موعد جديد</h2>
-                    <div className="panel">
-                      <label>اختر الخدمة:</label>
-                      <select id="serviceSelector" style={{ marginBottom: 20 }}>
-                        {services.map(s => <option key={s.id} value={s.id}>{s.name} — {s.price} جنيه</option>)}
-                      </select>
-                      <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
-                        <button type="button" className={bookingType === "advance" ? "primary" : "secondary"} onClick={() => setBookingType("advance")} style={{ flex: 1 }}>حجز مسبق (ميعاد محدد)</button>
-                        <button type="button" className={bookingType === "now" ? "primary" : "secondary"} onClick={() => setBookingType("now")} style={{ flex: 1 }}>حجز فوري (دور الآن)</button>
-                      </div>
-                      <form onSubmit={(e) => { const selectedId = document.getElementById("serviceSelector").value; const service = services.find(s => s.id === parseInt(selectedId)); handleBooking(e, service); }}>
-                        <label>الفرع</label>
-                        <select value={branch} onChange={e => setBranch(e.target.value)}>{branches.map(b => <option key={b}>{b}</option>)}</select>
-                        <label>الحلاق المفضل</label>
-                        <select value={barber} onChange={e => setBarber(e.target.value)}>{barbers.map(b => <option key={b}>{b}</option>)}</select>
-                        {bookingType === "advance" && (
-                          <>
-                            <div className="warning-box">⚠️ تنبيه هام: في الحجز المسبق، يتم دفع عربون (50% من قيمة الخدمة). هذا العربون غير مسترد في حالة عدم الحضور في الميعاد المحدد.</div>
-                            <label>تاريخ الحجز</label>
-                            <input type="date" min={new Date().toLocaleDateString("en-CA")} value={date} onChange={e => setDate(e.target.value)} required />
-                            <label>الميعاد</label>
-                            <select value={time} onChange={e => setTime(e.target.value)}>{times.map(t => <option key={t}>{t}</option>)}</select>
-                          </>
-                        )}
-                        <label>اسم العميل</label>
-                        <input value={name} onChange={e => setName(e.target.value)} placeholder="اكتب الاسم" required />
-                        <label>رقم الموبايل</label>
-                        <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="01xxxxxxxxx" required />
-                        <button className="primary" type="submit" style={{ marginTop: 20, width: "100%" }}>{bookingType === "advance" ? "تأكيد الحجز ودفع العربون" : "خذ رقم دورك الآن"}</button>
-                      </form>
-                    </div>
-                  </>
-                )}
+  const selectedService = services.find(
+    (service) => service.id === Number(serviceId)
+  );
 
-                {page === "bookings" && (
-                  <>
-                    <div className="hero" style={{ padding: 20, marginBottom: 20, textAlign: "center" }}>
-                      <h2 style={{ margin: 0, color: "white" }}>برنامج الولاء 🎁</h2>
-                      <p style={{ fontSize: 20, fontWeight: "bold", margin: "10px 0 0 0" }}>{visitsText}</p>
-                      <small style={{ color: "#ccc" }}>عدد زياراتك: {totalVisits}</small>
-                    </div>
-                    <h2 className="section">الحجوزات المسجلة</h2>
-                    {bookings.length === 0 ? (<div className="panel">لا توجد حجوزات حتى الآن.</div>) : (
-                      bookings.map(b => (
-                        <div className="panel" key={b.id} style={{ borderRight: b.type === 'دور الآن' ? '5px solid #e8bb76' : '5px solid #142238' }}>
-                          <div className="row"><h3>{b.name} — {b.service}</h3><span className="gold" style={{ fontWeight: "bold" }}>{b.type}</span></div>
-                          <p>الفرع: {b.branch} | الحلاق: {b.barber}</p>
-                          {b.type === "حجز مسبق" ? (<p>الموعد: {b.date} — {b.time} (العربون: {b.deposit} جنيه)</p>) : (<p style={{ fontSize: 20, color: '#d35400' }}>رقم الدور: <b>{b.turnNumber}</b></p>)}
-                          <small className="muted">{b.status}</small>
-                        </div>
-                      ))
-                    )}
-                  </>
-                )}
+  const totalIncome = bookings.reduce(
+    (sum, booking) => sum + Number(booking.deposit || 0),
+    0
+  );
+  const totalWithdrawals = withdrawals.reduce(
+    (sum, item) => sum + Number(item.amount || 0),
+    0
+  );
+  const balance = totalIncome - totalWithdrawals;
+  const isProfit = balance >= 0;
+  const today = new Date().toLocaleDateString("ar-EG");
 
-                {page === "games" && (
-                  <>
-                    <h2 className="section">تسلية (لعبة إكس أو) 🎮</h2>
-                    <div className="panel" style={{ textAlign: "center" }}>
-                      <h3>{winner ? `الفائز هو: ${winner}` : `دور اللاعب: ${isXNext ? 'X' : 'O'}`}</h3>
-                      <div className="game-board">
-                        {board.map((square, i) => (<button key={i} className="square" onClick={() => { if (winner || board[i]) return; const newBoard = [...board]; newBoard[i] = isXNext ? 'X' : 'O'; setBoard(newBoard); setIsXNext(!isXNext); }}>{square}</button>))}
-                      </div>
-                      <button className="secondary" style={{ marginTop: 20 }} onClick={() => { setBoard(Array(9).fill(null)); setIsXNext(true); }}>إعادة اللعب</button>
-                    </div>
-                  </>
-                )}
+  function createBooking(instant = false) {
+    if (!customer.trim() || !phone.trim()) {
+      alert("من فضلك اكتب اسم العميل ورقم التليفون");
+      return;
+    }
+    if (!instant && !date) {
+      alert("من فضلك اختار تاريخ الحجز");
+      return;
+    }
 
-                {page === "admin" && (
-                  <>
-                    <h2 className="section">لوحة الإدارة</h2>
-                    <div className="grid">
-                      <div className="stat">إجمالي الحجوزات<strong>{bookings.length}</strong></div>
-                      <div className="stat">حجوزات مسبقة<strong>{bookings.filter(b => b.type === "حجز مسبق").length}</strong></div>
-                      <div className="stat">في الانتظار (أدوار)<strong>{bookings.filter(b => b.type === "دور الآن").length}</strong></div>
-                    </div>
-                  </>
-                )}
-                <footer>بودي © 2026 — نموذج أولي قابل للتجربة</footer>
-              </main>
+    const queueNum = 100 + bookings.length;
+    const chairNum = (bookings.length % 5) + 1;
+
+    const booking = {
+      id: Date.now(),
+      customer: customer.trim(),
+      phone: phone.trim(),
+      branch,
+      service: selectedService.name,
+      price: selectedService.price,
+      barber,
+      date: instant ? "حجز فوري" : date,
+      time: instant ? "أقرب دور متاح" : time,
+      payment,
+      deposit: instant ? 0 : Math.round(selectedService.price * 0.5),
+      status: instant ? "انتظار" : "حجز مؤكد",
+      queueNumber: queueNum,
+      chairNumber: chairNum,
+      createdAt: new Date().toLocaleDateString("ar-EG"),
+    };
+
+    setBookings((previous) => [...previous, booking]);
+
+    if (instant) {
+      setLastInstantBooking(booking);
+      alert(
+        `تم تسجيل الحجز الفوري!\nرقم دورك: ${booking.queueNumber}\nاتفضل اقعد على كرسي رقم: ${booking.chairNumber}`
+      );
+    } else {
+      setLastInstantBooking(null);
+      alert(`تم تسجيل الحجز! العربون المطلوب ${booking.deposit} جنيه.`);
+    }
+
+    setCustomer("");
+    setPhone("");
+  }
+
+  function handleTasbeeh() {
+    const newCount = tasbeeh + 1;
+    if (newCount > 10) {
+      setTasbeeh(0);
+      setZekrIndex((prev) => (prev + 1) % zekrList.length);
+      setShowTasbeehMessage(true);
+      setTimeout(() => setShowTasbeehMessage(false), 3000);
+    } else {
+      setTasbeeh(newCount);
+    }
+  }
+
+  function unlockAdmin() {
+    if (adminPassword === "1") {
+      setAdminUnlocked(true);
+      alert("تم فتح لوحة الإدارة");
+    } else {
+      alert("كلمة المرور غير صحيحة");
+    }
+  }
+
+  function addWithdrawal() {
+    const amount = Number(withdrawAmount);
+    if (!withdrawName.trim() || !amount || amount <= 0) {
+      alert("اكتب اسم الموظف ومبلغ السحب الصحيح");
+      return;
+    }
+    setWithdrawals((previous) => [
+      ...previous,
+      {
+        id: Date.now(),
+        name: withdrawName.trim(),
+        amount,
+        note: withdrawNote.trim(),
+        date: new Date().toLocaleDateString("ar-EG"),
+      },
+    ]);
+    setWithdrawAmount("");
+    setWithdrawName("");
+    setWithdrawNote("");
+  }
+
+  function playXO(index) {
+    if (xoBoard[index] || xoMessage.includes("فاز") || xoBoard.every(Boolean))
+      return;
+    const nextBoard = [...xoBoard];
+    nextBoard[index] = xoTurn;
+    setXoBoard(nextBoard);
+    const wins = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6],
+    ];
+    if (
+      wins.some(
+        ([a, b, c]) =>
+          nextBoard[a] &&
+          nextBoard[a] === nextBoard[b] &&
+          nextBoard[a] === nextBoard[c]
+      )
+    )
+      setXoMessage(`اللاعب ${xoTurn} فاز!`);
+    else if (nextBoard.every(Boolean)) setXoMessage("تعادل!");
+    else {
+      const nextTurn = xoTurn === "X" ? "O" : "X";
+      setXoTurn(nextTurn);
+      setXoMessage(`دور اللاعب ${nextTurn}`);
+    }
+  }
+
+  function resetXO() {
+    setXoBoard(Array(9).fill(""));
+    setXoTurn("X");
+    setXoMessage("دور اللاعب X");
+  }
+
+  function startMemoryGame() {
+    const symbols = [
+      "✂️",
+      "💈",
+      "⭐",
+      "🔥",
+      "💎",
+      "🪒",
+      "✂️",
+      "💈",
+      "⭐",
+      "🔥",
+      "💎",
+      "🪒",
+    ];
+    setMemoryCards([...symbols].sort(() => Math.random() - 0.5));
+    setMemoryOpen([]);
+    setMemoryMatched([]);
+  }
+
+  function flipMemoryCard(index) {
+    if (
+      memoryOpen.includes(index) ||
+      memoryMatched.includes(index) ||
+      memoryOpen.length === 2
+    )
+      return;
+    const nextOpen = [...memoryOpen, index];
+    setMemoryOpen(nextOpen);
+    if (nextOpen.length === 2) {
+      const [first, second] = nextOpen;
+      if (memoryCards[first] === memoryCards[second]) {
+        setMemoryMatched((prev) => [...prev, first, second]);
+        setMemoryOpen([]);
+      } else {
+        setTimeout(() => setMemoryOpen([]), 800);
+      }
+    }
+  }
+
+  const filteredBookings = bookings.filter((booking) =>
+    `${booking.customer} ${booking.phone}`
+      .toLowerCase()
+      .includes(search.toLowerCase())
+  );
+  return (
+    <div className="boddy-app">
+      <header className="header">
+        <h1>💈 بودي</h1>
+        <p>أهلاً بعملاء بودي.. نتشرف بحضوركم!</p>
+      </header>
+
+      <div className="button-row">
+        <button className="secondary-btn" onClick={() => setPage("booking")}>
+          حجز موعد
+        </button>
+        <button className="secondary-btn" onClick={() => setPage("bookings")}>
+          حجوزاتي
+        </button>
+        <button className="secondary-btn" onClick={() => setPage("loyalty")}>
+          الجوائز
+        </button>
+        <button className="secondary-btn" onClick={() => setPage("adhkar")}>
+          الأذكار
+        </button>
+        <button className="secondary-btn" onClick={() => setPage("tasbeeh")}>
+          السبحة
+        </button>
+        <button className="secondary-btn" onClick={() => setPage("games")}>
+          الألعاب
+        </button>
+        <button className="secondary-btn" onClick={() => setPage("admin")}>
+          الإدارة
+        </button>
+      </div>
+
+      {page === "booking" && (
+        <>
+          <section className="card">
+            <h2>اختار الخدمة المناسبة ليك</h2>
+            <div className="service-grid">
+              {services.map((service) => (
+                <button
+                  key={service.id}
+                  className={`service-option ${
+                    Number(serviceId) === service.id ? "selected" : ""
+                  }`}
+                  onClick={() => setServiceId(service.id)}
+                >
+                  <strong>{service.name}</strong>
+                  <span className="price">{service.price} جنيه</span>
+                </button>
+              ))}
             </div>
-          );
-        }
+          </section>
+          <section className="card">
+            <h2>احجز عند بودي</h2>
+            <div className="form-grid">
+              <div className="field">
+                <label>اسم العميل</label>
+                <input
+                  value={customer}
+                  onChange={(e) => setCustomer(e.target.value)}
+                  placeholder="اكتب اسمك"
+                />
+              </div>
+              <div className="field">
+                <label>رقم التليفون</label>
+                <input
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="01xxxxxxxxx"
+                  inputMode="tel"
+                />
+              </div>
+              <div className="field">
+                <label>الفرع</label>
+                <select
+                  value={branch}
+                  onChange={(e) => setBranch(e.target.value)}
+                >
+                  {branches.map((item) => (
+                    <option key={item}>{item}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="field">
+                <label>الحلاق</label>
+                <select
+                  value={barber}
+                  onChange={(e) => setBarber(e.target.value)}
+                >
+                  {barbers.map((item) => (
+                    <option key={item}>{item}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="field">
+                <label>التاريخ</label>
+                <input
+                  type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                />
+              </div>
+              <div className="field">
+                <label>الوقت</label>
+                <select value={time} onChange={(e) => setTime(e.target.value)}>
+                  {times.map((item) => (
+                    <option key={item}>{item}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="notice">
+              سعر الخدمة: <strong>{selectedService.price} جنيه</strong>
+              <br />
+              العربون:{" "}
+              <strong>{Math.round(selectedService.price * 0.5)} جنيه</strong>
+            </div>
+            <div className="button-row">
+              <button
+                className="primary-btn"
+                onClick={() => createBooking(false)}
+              >
+                تأكيد الحجز
+              </button>
+              <button
+                className="secondary-btn"
+                onClick={() => createBooking(true)}
+              >
+                حجز فوري (دور)
+              </button>
+            </div>
+          </section>
 
-        function calculateWinner(squares) {
-          const lines = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
-          for (let i = 0; i < lines.length; i++) {
-            const [a, b, c] = lines[i];
-            if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) { return squares[a]; }
-          }
-          return null;
-        }
+          {lastInstantBooking && (
+            <section className="queue-display">
+              <h2>أهلاً بك يا {lastInstantBooking.customer}!</h2>
+              <p>
+                رقم دورك هو:{" "}
+                <span style={{ fontSize: 35, color: "#e8bb76" }}>
+                  {lastInstantBooking.queueNumber}
+                </span>
+              </p>
+              <p>
+                اتفضل اقعد على كرسي رقم:{" "}
+                <span style={{ fontSize: 35, color: "#e8bb76" }}>
+                  {lastInstantBooking.chairNumber}
+                </span>
+              </p>
+            </section>
+          )}
+        </>
+      )}
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
-</body>
-</html>
+      {page === "bookings" && (
+        <section className="card">
+          <h2>الحجوزات المسجلة</h2>
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="ابحث بالاسم"
+            style={{ marginBottom: 15 }}
+          />
+          <div>
+            {filteredBookings.length === 0 ? (
+              <p>لا توجد حجوزات.</p>
+            ) : (
+              filteredBookings.map((booking) => (
+                <div className="booking-item" key={booking.id}>
+                  <strong style={{ color: "#71b7ff" }}>
+                    {booking.customer}
+                  </strong>
+                  <p>
+                    {booking.service} — {booking.price} جنيه | الحلاق:{" "}
+                    {booking.barber}
+                  </p>
+                  <p>
+                    الموعد: {booking.date} — {booking.time} | رقم الدور:{" "}
+                    {booking.queueNumber}
+                  </p>
+                </div>
+              ))
+            )}
+          </div>
+        </section>
+      )}
+
+      {page === "loyalty" && (
+        <section className="card">
+          <h2>برنامج الجوائز 🎁</h2>
+          <p style={{ color: "#d0d8e5" }}>اجمع زياراتك واحصل على الجوائز!</p>
+          {bookings.length === 0 ? (
+            <p>لا توجد زيارات مسجلة حتى الآن.</p>
+          ) : (
+            bookings.map((booking) => (
+              <div className="booking-item" key={booking.id}>
+                <strong style={{ color: "#71b7ff" }}>{booking.customer}</strong>
+                <p>
+                  عدد الزيارات:{" "}
+                  {bookings.filter((b) => b.phone === booking.phone).length} / 5
+                </p>
+              </div>
+            ))
+          )}
+        </section>
+      )}
+
+      {page === "adhkar" && (
+        <section className="card">
+          <h2>أذكار وأدعية 🤍</h2>
+          <div className="booking-item">
+            <strong>ذكر الصباح والمساء</strong>
+            <p>سبحان الله وبحمده، سبحان الله العظيم.</p>
+            <p>أستغفر الله وأتوب إليه.</p>
+          </div>
+        </section>
+      )}
+
+      {page === "tasbeeh" && (
+        <section className="card" style={{ textAlign: "center" }}>
+          <h2>السبحة الإلكترونية 📿</h2>
+          <div className="zekr-selector">
+            <select
+              value={zekrIndex}
+              onChange={(e) => {
+                setZekrIndex(Number(e.target.value));
+                setTasbeeh(0);
+              }}
+            >
+              {zekrList.map((z, i) => (
+                <option key={i} value={i}>
+                  {z}
+                </option>
+              ))}
+            </select>
+          </div>
+          <p className="tasbeeh-text">{tasbeeh} / 10</p>
+          <button
+            className="primary-btn"
+            onClick={handleTasbeeh}
+            style={{ width: "100%", padding: 20, fontSize: 20 }}
+          >
+            {zekrList[zekrIndex]}
+          </button>
+          {showTasbeehMessage && (
+            <div
+              className="notice"
+              style={{
+                background: "#17663a",
+                color: "white",
+                fontWeight: "bold",
+              }}
+            >
+              🎉 عاش يا بطل! تم الانتقال للتسبيح التالي.
+            </div>
+          )}
+          <div
+            className="button-row"
+            style={{ justifyContent: "center", marginTop: 20 }}
+          >
+            <button className="secondary-btn" onClick={() => setTasbeeh(0)}>
+              تصفير العداد
+            </button>
+          </div>
+        </section>
+      )}
+
+      {page === "games" && (
+        <>
+          <section className="card">
+            <h2>لعبة XO ❌⭕</h2>
+            <p>{xoMessage}</p>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(3, 70px)",
+                gap: 7,
+                justifyContent: "center",
+              }}
+            >
+              {xoBoard.map((cell, index) => (
+                <button
+                  key={index}
+                  className="secondary-btn"
+                  style={{ height: 70, fontSize: 26 }}
+                  onClick={() => playXO(index)}
+                >
+                  {cell}
+                </button>
+              ))}
+            </div>
+            <div className="button-row">
+              <button className="primary-btn" onClick={resetXO}>
+                لعبة جديدة
+              </button>
+            </div>
+          </section>
+          <section className="card">
+            <h2>لعبة الذاكرة 🧠</h2>
+            <button className="primary-btn" onClick={startMemoryGame}>
+              ابدأ لعبة الذاكرة
+            </button>
+            {memoryCards.length > 0 && (
+              <div className="memory-grid">
+                {memoryCards.map((symbol, index) => (
+                  <button
+                    key={index}
+                    className={`memory-card ${
+                      memoryOpen.includes(index) ||
+                      memoryMatched.includes(index)
+                        ? "flipped"
+                        : ""
+                    }`}
+                    onClick={() => flipMemoryCard(index)}
+                  >
+                    {memoryOpen.includes(index) || memoryMatched.includes(index)
+                      ? symbol
+                      : "❓"}
+                  </button>
+                ))}
+              </div>
+            )}
+          </section>
+        </>
+      )}
+
+      {page === "admin" && (
+        <section className="card">
+          <h2>لوحة الإدارة (المالك)</h2>
+          {!adminUnlocked ? (
+            <div>
+              <div className="field">
+                <label>كلمة المرور</label>
+                <input
+                  type="password"
+                  value={adminPassword}
+                  onChange={(e) => setAdminPassword(e.target.value)}
+                  placeholder="أدخل الباسورد"
+                />
+              </div>
+              <div className="button-row">
+                <button className="primary-btn" onClick={unlockAdmin}>
+                  دخول
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <h3 style={{ color: "#71b7ff" }}>
+                التقرير المالي (تاريخ: {today})
+              </h3>
+              <div className="stat-grid">
+                <div className="stat">
+                  إجمالي الدخل
+                  <strong>{totalIncome} جنيه</strong>
+                  <small style={{ color: "#aaa" }}>عربون الحجوزات</small>
+                </div>
+                <div className="stat">
+                  إجمالي المسحوبات
+                  <strong>{totalWithdrawals} جنيه</strong>
+                  <small style={{ color: "#aaa" }}>سحب الموظفين</small>
+                </div>
+                <div
+                  className="stat"
+                  style={{
+                    border: `1px solid ${isProfit ? "#17663a" : "#9b2525"}`,
+                    background: isProfit ? "#172b43" : "#351b23",
+                  }}
+                >
+                  الرصيد المتبقي
+                  <strong style={{ color: isProfit ? "#4ade80" : "#f87171" }}>
+                    {balance} جنيه
+                  </strong>
+                  <small
+                    style={{
+                      color: isProfit ? "#4ade80" : "#f87171",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {isProfit ? "📈 المشروع مكسب" : "📉 المشروع فيه خسارة"}
+                  </small>
+                </div>
+              </div>
+
+              <h2 style={{ marginTop: 30 }}>تسجيل سحب نقدية</h2>
+              <div className="form-grid">
+                <div className="field">
+                  <label>اسم الموظف</label>
+                  <input
+                    value={withdrawName}
+                    onChange={(e) => setWithdrawName(e.target.value)}
+                    placeholder="اسم اللي سحب"
+                  />
+                </div>
+                <div className="field">
+                  <label>المبلغ</label>
+                  <input
+                    value={withdrawAmount}
+                    onChange={(e) => setWithdrawAmount(e.target.value)}
+                    placeholder="المبلغ"
+                  />
+                </div>
+                <div className="field">
+                  <label>ملاحظات</label>
+                  <input
+                    value={withdrawNote}
+                    onChange={(e) => setWithdrawNote(e.target.value)}
+                    placeholder="سبب السحب"
+                  />
+                </div>
+              </div>
+              <div className="button-row">
+                <button className="primary-btn" onClick={addWithdrawal}>
+                  تسجيل السحب
+                </button>
+              </div>
+
+              <div style={{ marginTop: 20 }}>
+                <h3 style={{ color: "#d5deeb" }}>سجل المسحوبات:</h3>
+                {withdrawals.length === 0 ? (
+                  <p style={{ color: "#aaa" }}>لا يوجد مسحوبات.</p>
+                ) : (
+                  withdrawals.map((item) => (
+                    <div
+                      className="booking-item"
+                      key={item.id}
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <div>
+                        <strong>{item.name}</strong> سحب {item.amount} جنيه
+                        <p style={{ fontSize: 12, color: "#aaa", margin: 0 }}>
+                          {item.note || "بدون سبب"} | {item.date}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+        </section>
+      )}
+
+      <footer className="footer">
+        <p>بودي © 2026 - كل الحقوق محفوظة</p>
+        <div>
+          <a href="https://facebook.com" target="_blank" rel="noreferrer">
+            فيسبوك
+          </a>
+          <a href="https://instagram.com" target="_blank" rel="noreferrer">
+            انستجرام
+          </a>
+          <a href="https://wa.me/201000000000" target="_blank" rel="noreferrer">
+            واتساب
+          </a>
+        </div>
+      </footer>
+    </div>
+  );
+}
